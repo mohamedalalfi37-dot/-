@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>العب وادلع | منصة التحميل المباشر</title>
+    
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#E50914',
+                            redHover: '#b80710',
+                            dark: '#0a0a0a',
+                            card: '#141414',
+                            border: '#262626',
+                            accent: '#ff2e3b'
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #080808;
+            color: #f3f4f6;
+            overflow-x: hidden;
+        }
+
+        .glow-red {
+            box-shadow: 0 0 25px rgba(229, 9, 20, 0.4);
+        }
+        
+        .glow-red-sm {
+            box-shadow: 0 0 12px rgba(229, 9, 20, 0.3);
+        }
+
+        .text-glow {
+            text-shadow: 0 0 15px rgba(229, 9, 20, 0.8), 0 0 30px rgba(229, 9, 20, 0.4);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e50914;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #b80710;
+        }
+
+        .file-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .file-card:hover {
+            transform: translateY(-6px);
+            border-color: #e50914;
+            box-shadow: 0 12px 30px -5px rgba(229, 9, 20, 0.35);
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.85; transform: scale(1.03); }
+        }
+        .pulse-badge {
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-brand-red selection:text-white">
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-brand-dark/95 backdrop-blur-md border-b border-brand-border transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Logo & Brand Name -->
+                <div class="flex items-center space-x-3 space-x-reverse cursor-pointer" onclick="switchTab('available')">
+                    <div class="w-12 h-12 bg-gradient-to-br from-brand-red to-black rounded-2xl flex items-center justify-center border border-brand-red/60 glow-red-sm">
+                        <i class="fa-solid fa-gamepad text-2xl text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl sm:text-3xl font-black tracking-wide text-white text-glow">
+                            العب <span class="text-brand-red">وادلع</span>
+                        </h1>
+                        <p class="text-xs text-gray-400 font-medium">منصة التحميل المباشر للمتابعين</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="hidden md:flex space-x-2 space-x-reverse bg-black/80 p-1.5 rounded-2xl border border-brand-border">
+                    <button id="nav-available" onclick="switchTab('available')" class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all bg-brand-red text-white shadow-lg glow-red-sm">
+                        <i class="fa-solid fa-download"></i>
+                        <span>الملفات المتاحة</span>
+                    </button>
+                    <button id="nav-soon" onclick="switchTab('soon')" class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-gray-400 hover:text-white transition-all">
+                        <i class="fa-solid fa-clock"></i>
+                        <span>قريباً</span>
+                    </button>
+                </nav>
+
+                <!-- Quick Action Button -->
+                <button onclick="openAddModal()" class="flex items-center gap-2 bg-brand-red text-white hover:bg-brand-redHover border border-brand-red px-5 py-2.5 rounded-xl text-sm font-bold transition-all glow-red-sm shadow-lg">
+                    <i class="fa-solid fa-file-arrow-up"></i>
+                    <span class="hidden sm:inline">رفع ملف جديد</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Bar -->
+        <div class="md:hidden flex border-t border-brand-border bg-black/90">
+            <button id="mobile-nav-available" onclick="switchTab('available')" class="flex-1 py-3 text-center text-sm font-bold bg-brand-red text-white">
+                <i class="fa-solid fa-download ml-1"></i> الملفات المتاحة
+            </button>
+            <button id="mobile-nav-soon" onclick="switchTab('soon')" class="flex-1 py-3 text-center text-sm font-bold text-gray-400 border-r border-brand-border">
+                <i class="fa-solid fa-clock ml-1"></i> قريباً
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+        
+        <!-- Hero Banner -->
+        <div class="relative rounded-3xl bg-gradient-to-r from-brand-card via-black to-brand-card border border-brand-border p-6 sm:p-10 mb-10 overflow-hidden shadow-2xl">
+            <div class="absolute -right-20 -top-20 w-64 h-64 bg-brand-red/15 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-brand-red/15 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="text-center md:text-right">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-brand-red/20 text-brand-red border border-brand-red/30 mb-3">
+                        <span class="w-2 h-2 rounded-full bg-brand-red animate-ping"></span>
+                        تحميل مباشر وسريع 100%
+                    </span>
+                    <h2 class="text-2xl sm:text-4xl font-black text-white mb-2">
+                        مركز التحميل والمودات المباشر
+                    </h2>
+                    <p class="text-gray-400 text-sm sm:text-base max-w-2xl">
+                        اختر الملفات مباشرة وتلقائياً بنقرة زر واحدة دون الانتظار أو الإعلانات المزعجة.
+                    </p>
+                </div>
+
+                <!-- Live Search Bar -->
+                <div class="w-full md:w-80">
+                    <div class="relative">
+                        <input type="text" id="search-input" onkeyup="filterFiles()" placeholder="ابحث عن ملف..." 
+                            class="w-full bg-black/80 text-white placeholder-gray-500 border border-brand-border focus:border-brand-red rounded-2xl py-3 pr-11 pl-4 outline-none transition-all shadow-inner">
+                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 1: AVAILABLE DOWNLOADS -->
+        <section id="section-available" class="space-y-6">
+            <div class="flex items-center justify-between border-b border-brand-border pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-3 h-8 bg-brand-red rounded-full"></div>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white">الملفات المتاحة للتحميل المباشر</h3>
+                    <span id="available-count" class="bg-brand-red/20 text-brand-red border border-brand-red/30 text-xs font-bold px-2.5 py-0.5 rounded-full">0 ملفات</span>
+                </div>
+            </div>
+
+            <!-- Grid Container for Files -->
+            <div id="available-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="text-center py-16 bg-brand-card/40 rounded-3xl border border-brand-border">
+                <div class="w-16 h-16 bg-brand-red/10 border border-brand-red/30 rounded-2xl flex items-center justify-center mx-auto mb-4 text-brand-red text-3xl">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <h4 class="text-lg font-bold text-gray-200">لا توجد ملفات متاحة حالياً</h4>
+                <p class="text-sm text-gray-500 mt-1 max-w-md mx-auto mb-6">قم باختيار ورفع أو إضافة أول ملف من جهازك مباشرة للتحميل الفوري.</p>
+                <button onclick="openAddModal()" class="px-6 py-3 bg-brand-red hover:bg-brand-redHover text-white font-bold rounded-xl transition-all shadow-lg glow-red-sm">
+                    <i class="fa-solid fa-plus ml-1"></i> رفع ملف من جهازك الآن
+                </button>
+            </div>
+        </section>
+
+        <!-- SECTION 2: COMING SOON -->
+        <section id="section-soon" class="space-y-6 hidden">
+            <div class="flex items-center justify-between border-b border-brand-border pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-3 h-8 bg-amber-500 rounded-full"></div>
+                    <h3 class="text-xl sm:text-2xl font-bold text-white">الملفات القادمة قريباً</h3>
+                    <span class="bg-amber-500/20 text-amber-500 border border-amber-500/30 text-xs font-bold px-2.5 py-0.5 rounded-full">تحت الجهوزية</span>
+                </div>
+            </div>
+
+            <div id="soon-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Coming Soon Card 1 (24GB File) -->
+                <div class="bg-brand-card rounded-2xl border border-brand-border p-5 relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute top-4 left-4">
+                        <span class="pulse-badge inline-flex items-center gap-1.5 bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-black px-3 py-1 rounded-full">
+                            <i class="fa-solid fa-fire text-amber-400"></i> قريباً جداً
+                        </span>
+                    </div>
+
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 text-2xl mb-4">
+                            <i class="fa-solid fa-hard-drive"></i>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs font-bold text-gray-400 mb-1">
+                            <span><i class="fa-solid fa-database text-amber-500"></i> 24.0 GB</span>
+                            <span>•</span>
+                            <span>تجميعة ضخمة</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-white mb-2">الملف الضخم الشامل (24 جيجا)</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                            التحديث والأرشيف الضخم المجهز لكم حالياً. جاري تجهيز واستكمال الترفيع للتحميل المباشر.
+                        </p>
+
+                        <div class="mb-5 bg-black/60 p-3 rounded-xl border border-brand-border">
+                            <div class="flex justify-between text-xs font-semibold text-gray-300 mb-1">
+                                <span>نسبة الجاهزية:</span>
+                                <span class="text-amber-400">95%</span>
+                            </div>
+                            <div class="w-full bg-gray-800 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-amber-600 to-amber-400 h-2 rounded-full" style="width: 95%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button disabled class="w-full py-3 bg-gray-800/80 text-gray-500 font-bold rounded-xl cursor-not-allowed flex items-center justify-center gap-2 border border-gray-700/50">
+                        <i class="fa-solid fa-lock"></i>
+                        <span>غير متاح حالياً</span>
+                    </button>
+                </div>
+
+                <!-- Coming Soon Card 2 -->
+                <div class="bg-brand-card rounded-2xl border border-brand-border p-5 relative overflow-hidden flex flex-col justify-between">
+                    <div class="absolute top-4 left-4">
+                        <span class="inline-flex items-center gap-1.5 bg-gray-800 text-gray-300 text-xs font-bold px-3 py-1 rounded-full border border-gray-700">
+                            قريباً
+                        </span>
+                    </div>
+
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 text-2xl mb-4">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </div>
+                        <div class="flex items-center gap-2 text-xs font-bold text-gray-400 mb-1">
+                            <span><i class="fa-solid fa-database text-blue-400"></i> جاري التحديد</span>
+                            <span>•</span>
+                            <span>مشروع جديد</span>
+                        </div>
+                        <h4 class="text-lg font-bold text-white mb-2">مشروع الألعاب القادم</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed mb-4">
+                            مفاجأة جديدة للمتابعين قيد التطوير والتجهيز سيتم الكشف عنها فور الانتهاء.
+                        </p>
+
+                        <div class="mb-5 bg-black/60 p-3 rounded-xl border border-brand-border">
+                            <div class="flex justify-between text-xs font-semibold text-gray-300 mb-1">
+                                <span>نسبة الجاهزية:</span>
+                                <span class="text-blue-400">60%</span>
+                            </div>
+                            <div class="w-full bg-gray-800 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-blue-600 to-blue-400 h-2 rounded-full" style="width: 60%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button disabled class="w-full py-3 bg-gray-800/80 text-gray-500 font-bold rounded-xl cursor-not-allowed flex items-center justify-center gap-2 border border-gray-700/50">
+                        <i class="fa-solid fa-lock"></i>
+                        <span>قيد العمل</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal: Add / Upload New Direct File -->
+    <div id="add-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md hidden transition-all duration-300">
+        <div class="bg-brand-card border border-brand-border rounded-3xl max-w-lg w-full p-6 relative shadow-2xl glow-red">
+            
+            <button onclick="closeAddModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white text-xl w-8 h-8 rounded-full bg-black/50 flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 bg-brand-red/20 border border-brand-red text-brand-red rounded-xl flex items-center justify-center text-2xl">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-white">إضافة أو رفع ملف للتحميل المباشر</h3>
+                    <p class="text-xs text-gray-400">اختر ملفاً مباشرة من جهازك أو ضع رابطاً إلكترونياً مباشر</p>
+                </div>
+            </div>
+
+            <!-- Upload Type Selector -->
+            <div class="grid grid-cols-2 gap-2 mb-4 bg-black/60 p-1 rounded-xl border border-brand-border">
+                <button type="button" id="tab-mode-file" onclick="setUploadMode('file')" class="py-2 rounded-lg text-xs font-bold transition-all bg-brand-red text-white">
+                    <i class="fa-solid fa-laptop ml-1"></i> اختيار ملف من الجهاز
+                </button>
+                <button type="button" id="tab-mode-url" onclick="setUploadMode('url')" class="py-2 rounded-lg text-xs font-bold transition-all text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-link ml-1"></i> رابط مباشر
+                </button>
+            </div>
+
+            <form onsubmit="addNewFile(event)" class="space-y-4">
+                
+                <!-- Local File Upload Box -->
+                <div id="upload-box-file" class="block">
+                    <label class="block text-xs font-bold text-gray-300 mb-1">اختر الملف من جهازك</label>
+                    <div class="border-2 border-dashed border-brand-border hover:border-brand-red bg-black/40 rounded-2xl p-6 text-center cursor-pointer transition-all" onclick="document.getElementById('local-file-input').click()">
+                        <i class="fa-solid fa-file-circle-plus text-3xl text-brand-red mb-2"></i>
+                        <p id="file-picker-label" class="text-sm font-semibold text-gray-300">اضغط هنا لاختيار ملف من جهازك</p>
+                        <p class="text-xs text-gray-500 mt-1">يتم إنشاء رابط تحميل مباشر فوري للمتابعين</p>
+                    </div>
+                    <input type="file" id="local-file-input" class="hidden" onchange="handleFileSelect(event)">
+                </div>
+
+                <!-- External URL Box -->
+                <div id="upload-box-url" class="hidden">
+                    <label class="block text-xs font-bold text-gray-300 mb-1">رابط التحميل المباشر</label>
+                    <input type="url" id="file-url" placeholder="https://..." 
+                        class="w-full bg-black/60 border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:border-brand-red outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1">اسم الملف / اللعبة</label>
+                    <input type="text" id="file-name" required placeholder="مثال: مود السيارات 2026" 
+                        class="w-full bg-black/60 border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:border-brand-red outline-none">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1">الحجم</label>
+                        <input type="text" id="file-size" required placeholder="مثال: 500 MB" 
+                            class="w-full bg-black/60 border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:border-brand-red outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-300 mb-1">القسم / التصنيف</label>
+                        <input type="text" id="file-category" required placeholder="مثال: ألعاب / مودات" 
+                            class="w-full bg-black/60 border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:border-brand-red outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-300 mb-1">وصف الملف</label>
+                    <textarea id="file-desc" rows="2" placeholder="اكتب وصفاً مقنعاً ومختصراً..." 
+                        class="w-full bg-black/60 border border-brand-border rounded-xl px-4 py-2.5 text-sm text-white focus:border-brand-red outline-none"></textarea>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <button type="submit" class="flex-1 py-3 bg-brand-red hover:bg-brand-redHover text-white font-bold rounded-xl transition-all glow-red-sm">
+                        <i class="fa-solid fa-check ml-1"></i> اعتماد وحفظ الملف
+                    </button>
+                    <button type="button" onclick="closeAddModal()" class="px-5 py-3 bg-gray-800 text-gray-300 font-bold rounded-xl hover:bg-gray-700">
+                        إلغاء
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer Section -->
+    <footer class="bg-black border-t border-brand-border mt-16 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-2 space-x-reverse">
+                <i class="fa-solid fa-gamepad text-brand-red text-xl"></i>
+                <span class="font-bold text-white">العب وادلع</span>
+                <span class="text-gray-500 text-sm">| جميع الحقوق محفوظة &copy; 2026</span>
+            </div>
+
+            <div class="flex items-center gap-4 text-gray-400 text-lg">
+                <a href="#" class="hover:text-brand-red transition-colors" title="يوتيوب"><i class="fa-brands fa-youtube"></i></a>
+                <a href="#" class="hover:text-brand-red transition-colors" title="ديسكورد"><i class="fa-brands fa-discord"></i></a>
+                <a href="#" class="hover:text-brand-red transition-colors" title="تليجرام"><i class="fa-brands fa-telegram"></i></a>
+                <a href="#" class="hover:text-brand-red transition-colors" title="تيك توك"><i class="fa-brands fa-tiktok"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // كلمة السر المعتمدة الجديدة
+        const SECRET_PASSWORD = "Mohamed5";
+
+        function verifyPassword() {
+            const input = prompt("أدخل كلمة السر للمتابعة:");
+            if (!input) return false;
+
+            if (input.trim() === SECRET_PASSWORD) {
+                return true;
+            } else {
+                alert("كلمة السر غير صحيحة!");
+                return false;
+            }
+        }
+
+        let filesData = JSON.parse(localStorage.getItem('al3ab_files_direct')) || [];
+        let currentUploadMode = 'file';
+        let selectedBlobUrl = '';
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        function setUploadMode(mode) {
+            currentUploadMode = mode;
+            const btnFile = document.getElementById('tab-mode-file');
+            const btnUrl = document.getElementById('tab-mode-url');
+            const boxFile = document.getElementById('upload-box-file');
+            const boxUrl = document.getElementById('upload-box-url');
+
+            if (mode === 'file') {
+                btnFile.className = "py-2 rounded-lg text-xs font-bold transition-all bg-brand-red text-white";
+                btnUrl.className = "py-2 rounded-lg text-xs font-bold transition-all text-gray-400 hover:text-white";
+                boxFile.classList.remove('hidden');
+                boxUrl.classList.add('hidden');
+            } else {
+                btnUrl.className = "py-2 rounded-lg text-xs font-bold transition-all bg-brand-red text-white";
+                btnFile.className = "py-2 rounded-lg text-xs font-bold transition-all text-gray-400 hover:text-white";
+                boxUrl.classList.remove('hidden');
+                boxFile.classList.add('hidden');
+            }
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedBlobUrl = URL.createObjectURL(file);
+                document.getElementById('file-picker-label').innerText = `تم اختيار: ${file.name}`;
+                document.getElementById('file-name').value = file.name;
+                document.getElementById('file-size').value = formatBytes(file.size);
+                document.getElementById('file-category').value = file.type ? file.type.split('/')[0].toUpperCase() : 'ملف عام';
+            }
+        }
+
+        function renderFiles(files) {
+            const grid = document.getElementById('available-grid');
+            const emptyState = document.getElementById('empty-state');
+            
+            grid.innerHTML = '';
+
+            if (files.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            files.forEach((file, index) => {
+                const card = document.createElement('div');
+                card.className = "file-card bg-brand-card rounded-2xl border border-brand-border p-5 flex flex-col justify-between relative";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-xl bg-black/60 border border-brand-border flex items-center justify-center text-brand-red text-2xl">
+                                <i class="fa-solid fa-file-arrow-down"></i>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="bg-black/50 text-gray-300 border border-brand-border text-xs font-semibold px-3 py-1 rounded-full">
+                                    ${file.category}
+                                </span>
+                                <button onclick="deleteFile(${index})" class="text-gray-500 hover:text-red-500 p-1 text-xs" title="حذف الملف">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <h4 class="text-lg font-bold text-white mb-2 hover:text-brand-red transition-colors">${file.title}</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed mb-4">${file.description || 'لا يوجد وصف متاح.'}</p>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between text-xs text-gray-400 font-semibold mb-4 bg-black/40 p-2.5 rounded-xl border border-brand-border/60">
+                            <span><i class="fa-solid fa-hard-drive text-brand-red ml-1"></i> ${file.size}</span>
+                            <span><i class="fa-solid fa-circle-check text-green-400 ml-1"></i> جاهز للتحميل</span>
+                        </div>
+
+                        <a href="${file.downloadUrl}" download="${file.title}" 
+                            class="w-full py-3 bg-brand-red hover:bg-brand-redHover text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all glow-red-sm active:scale-95 text-center">
+                            <i class="fa-solid fa-bolt"></i>
+                            <span>تحميل مباشر الآن</span>
+                        </a>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+
+            document.getElementById('available-count').innerText = `${files.length} ملفات`;
+        }
+
+        function addNewFile(e) {
+            e.preventDefault();
+
+            let targetUrl = selectedBlobUrl;
+            if (currentUploadMode === 'url') {
+                targetUrl = document.getElementById('file-url').value;
+            }
+
+            if (!targetUrl) {
+                alert('يرجى اختيار ملف من الجهاز أو إدخال رابط تحميل مباشر صحيح!');
+                return;
+            }
+
+            const newFile = {
+                title: document.getElementById('file-name').value,
+                size: document.getElementById('file-size').value,
+                category: document.getElementById('file-category').value || 'عام',
+                downloadUrl: targetUrl,
+                description: document.getElementById('file-desc').value
+            };
+
+            filesData.unshift(newFile);
+            
+            try {
+                localStorage.setItem('al3ab_files_direct', JSON.stringify(filesData));
+            } catch (err) {}
+
+            renderFiles(filesData);
+            closeAddModal();
+
+            e.target.reset();
+            selectedBlobUrl = '';
+            document.getElementById('file-picker-label').innerText = 'اضغط هنا لاختيار ملف من جهازك';
+        }
+
+        function deleteFile(index) {
+            if (verifyPassword()) {
+                if (confirm("هل أنت تأكد من رغبتك في حذف هذا الملف؟")) {
+                    filesData.splice(index, 1);
+                    try {
+                        localStorage.setItem('al3ab_files_direct', JSON.stringify(filesData));
+                    } catch (e) {}
+                    renderFiles(filesData);
+                }
+            }
+        }
+
+        function filterFiles() {
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+            const filtered = filesData.filter(file => 
+                file.title.toLowerCase().includes(query) || 
+                file.description.toLowerCase().includes(query) ||
+                file.category.toLowerCase().includes(query)
+            );
+            renderFiles(filtered);
+        }
+
+        function switchTab(tab) {
+            const secAvailable = document.getElementById('section-available');
+            const secSoon = document.getElementById('section-soon');
+            const navAvailable = document.getElementById('nav-available');
+            const navSoon = document.getElementById('nav-soon');
+            const mobileNavAvailable = document.getElementById('mobile-nav-available');
+            const mobileNavSoon = document.getElementById('mobile-nav-soon');
+
+            if (tab === 'available') {
+                secAvailable.classList.remove('hidden');
+                secSoon.classList.add('hidden');
+
+                navAvailable.className = "flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all bg-brand-red text-white shadow-lg glow-red-sm";
+                navSoon.className = "flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-gray-400 hover:text-white transition-all";
+
+                mobileNavAvailable.className = "flex-1 py-3 text-center text-sm font-bold bg-brand-red text-white";
+                mobileNavSoon.className = "flex-1 py-3 text-center text-sm font-bold text-gray-400 border-r border-brand-border";
+            } else {
+                secAvailable.classList.add('hidden');
+                secSoon.classList.remove('hidden');
+
+                navSoon.className = "flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all bg-brand-red text-white shadow-lg glow-red-sm";
+                navAvailable.className = "flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-gray-400 hover:text-white transition-all";
+
+                mobileNavSoon.className = "flex-1 py-3 text-center text-sm font-bold bg-brand-red text-white border-r border-brand-border";
+                mobileNavAvailable.className = "flex-1 py-3 text-center text-sm font-bold text-gray-400";
+            }
+        }
+
+        function openAddModal() {
+            if (verifyPassword()) {
+                document.getElementById('add-modal').classList.remove('hidden');
+            }
+        }
+
+        function closeAddModal() {
+            document.getElementById('add-modal').classList.add('hidden');
+        }
+
+        window.onload = function() {
+            renderFiles(filesData);
+        };
+    </script>
+</body>
+</html>
